@@ -2,43 +2,37 @@ import scipy
 from collections import Counter
 import numpy as np
 
-class KNN:
-    """
-    Class to do KNN classification with
-    """
-    def __init__(self, k):
+
+def euclidean(point, data):
+    return np.sqrt(np.sum((point-data)**2, axis=1))
+
+def most_common(lst):
+    return max(set(lst), key=lst.count)
+
+class KNearestNeighbor:
+    def __init__(self, k, dist_metric=euclidean):
         self.k = k
-
-    def fit(self, X, y):
-        self.X_train = X
-        self.y_train = y
-
-    def distance(self, X1, X2):
-        distance = scipy.spatial.distance.euclidean(X1, X2)
-        return distance
+        self.dist_metric = dist_metric
+    
+    def fit(self, X_train, y_train):
+        self.X_train = X_train
+        self.y_train = y_train
 
     def predict(self, X_test):
-        final_output = []
-        for i in range(len(X_test)):
-            d = []
-            votes = []
-            for j in range(len(self.X_train)):
-                dist = scipy.spatial.distance.euclidean(self.X_train[j] , X_test[i])
-                d.append([dist, j])
-            d.sort()
-            d = d[0:self.k]
-            for d, j in d:
-                votes.append(self.y_train[j])
-            ans = Counter(votes).most_common(1)[0][0]
-            final_output.append(ans)
-            
-        return final_output
-
-    def score(self, X_test, y_test):
-        predictions = self.predict(X_test)
-        return (predictions == y_test).sum() / len(y_test)
+        neighbors = []
+        for x in X_test:
+            distances = self.dist_metric(x, self.X_train)
+            y_sorted = [y for _, y in sorted(zip(distances, self.y_train))]
+            neighbors.append(y_sorted[:self.k])
+        return list(map(most_common, neighbors))
+    
+    def evaluate(self, X_test, y_test):
+        y_pred = self.predict(X_test)
+        accuracy = sum(y_pred == y_test) / len(y_test)
+        return accuracy
 
 
+###
 def KNN_regressor(X_train, X_test, y_train, y_test, n_neigh):
     """
     KNN regression function
