@@ -9,23 +9,9 @@ def w_lsq(X,y,d):
     :return: Estimated coefficient vector for the linear regression
     """
 
-    # # add column of ones for the intercept
-    ones = np.ones((len(X), 1))
+    ones = np.ones((len(X), 1)) # add column of ones for the intercept
     X = np.concatenate((ones, X), axis=1)
+    W = np.diag(np.full(len(X), d))  # Create weight matrix (with weights on diagonal)
 
-    # # calculate the coefficients including weight vector
+    return np.linalg.multi_dot([np.linalg.inv(np.linalg.multi_dot([X.T, W, X])), X.T, W, y])
 
-    # Create weight matrix (with weights on diagonal)
-    W = np.diag(np.full(len(X), d))
-
-    # calculate dot products with weight matrix W
-    A = np.linalg.inv(np.linalg.multi_dot([np.transpose(X), W, X]))
-    B = np.linalg.multi_dot([np.transpose(X), W, y])
-    
-    # calculate coefficients
-    beta = np.dot(A, B)
-
-    # The operations above in 1 go
-    #beta = np.dot(np.linalg.inv(np.linalg.multi_dot([X.T, W, X])), (np.linalg.multi_dot([X.T, W, y])))
-    
-    return beta
