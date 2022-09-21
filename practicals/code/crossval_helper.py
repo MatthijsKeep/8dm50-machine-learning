@@ -156,12 +156,25 @@ def crossval_gridsearch(synthetic=False, synthetic_params=None, dataset=None):
     print(f"Test-set score: {poly_grid.score(X_test.reshape(-1, 1), y_test):.2f}")
 
     y_pred = poly_grid.predict(X_test.reshape(-1,1)) 
-    print(y_pred[:3], y_test[:3])
+
+    if dataset == 'diabetes':
+        print(f"The predicted values are: {y_pred}")
+        print(f"The actual values are: {y_test}")
+        print(f"The difference between the predicted and actual values are: {y_pred - y_test}")
+        # put Y_pred in the order such that it will plot correctly
+        
+
 
     plt.figure(figsize=(10, 6))
     plt.title(f"Polynomial regression of degree {poly_grid.best_estimator_[0]}", size=16)
     plt.scatter(X_train.reshape(-1, 1), y_train)
-    plt.plot(X_test.reshape(-1, 1), y_pred, c="red")
+    # order the x values for the prediction
+    order = np.argsort(y_pred)
+    if dataset == 'diabetes':
+        # convert to 2D
+        plt.plot(X_test[order], y_pred[order], color='red', linewidth=3)
+    else:
+        plt.plot(X_test, y_pred, c='red')
 
     # Plot test set in orange
     plt.scatter(X_test.reshape(-1, 1), y_test, c='orange')
