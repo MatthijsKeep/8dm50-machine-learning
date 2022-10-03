@@ -15,6 +15,7 @@ def load_data(impaths_all, test=False):
     :return: Numpy array of images, masks and segmentations
     """
     # Save all images, masks and segmentations
+    # print(impaths_all)
     images = []
     masks = []
     segmentations = []
